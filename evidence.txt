@@ -1,0 +1,149 @@
+
+== caller ==
+{
+    "UserId": "AIDA472839165024F3K9Q",
+    "Account": "472839165024",
+    "Arn": "arn:aws:iam::472839165024:user/annus.shahzad"
+}
+
+== public-access ==
+{
+    "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": true,
+        "IgnorePublicAcls": true,
+        "BlockPublicPolicy": true,
+        "RestrictPublicBuckets": true
+    }
+}
+
+== versioning ==
+{
+    "Status": "Enabled"
+}
+
+== objects ==
+2026-11-13 17:28:28       8646 site/index.html
+2026-11-13 17:28:29       1661 site/style.css
+2026-11-13 17:28:30     147482 site/cv.pdf
+
+== ec2-policy ==
+inline policy: CVEC2SiteReadOnly
+{
+    "RoleName": "cv-ec2-role-23l-3004",
+    "PolicyName": "CVEC2SiteReadOnly",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "ReadSiteObjects",
+                "Effect": "Allow",
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::cv-23l-3004/site/*"
+            },
+            {
+                "Sid": "ListSitePrefix",
+                "Effect": "Allow",
+                "Action": "s3:ListBucket",
+                "Resource": "arn:aws:s3:::cv-23l-3004",
+                "Condition": {
+                    "StringEquals": {
+                        "s3:prefix": "site/"
+                    }
+                }
+            }
+        ]
+    }
+}
+{
+    "AttachedPolicies": []
+}
+
+== lambda-policy ==
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AWSLambdaBasicExecutionRole",
+            "PolicyArn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        }
+    ]
+}
+inline policy: CVLambdaSiteReadOnly
+{
+    "RoleName": "cv-lambda-role-23l-3004",
+    "PolicyName": "CVLambdaSiteReadOnly",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "ReadSiteObjects",
+                "Effect": "Allow",
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::cv-23l-3004/site/*"
+            }
+        ]
+    }
+}
+
+== security-group ==
+[
+    {
+        "Group": "sg-0abc123def4567890a",
+        "Inbound": [
+            {
+                "IpProtocol": "tcp",
+                "FromPort": 80,
+                "ToPort": 80,
+                "IpRanges": [
+                    {
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            },
+            {
+                "IpProtocol": "tcp",
+                "FromPort": 22,
+                "ToPort": 22,
+                "IpRanges": [
+                    {
+                        "CidrIp": "103.11.111.51/32"
+                    }
+                ]
+            }
+        ]
+    }
+]
+
+== instance ==
+{
+    "InstanceId": "i-0f8e7d6c5b4a39281",
+    "Type": "t3.micro",
+    "State": "running",
+    "PublicIp": "13.232.87.45",
+    "IMDS_HttpTokens": "required",
+    "InstanceProfile": "arn:aws:iam::472839165024:instance-profile/cv-ec2-role-23l-3004"
+}
+
+== endpoints ==
+http://13.232.87.45/ -> status=200 content-type=text/html
+http://13.232.87.45/style.css -> status=200 content-type=text/css
+http://13.232.87.45/cv.pdf -> status=200 content-type=application/pdf
+https://qw7x2k9p4m6n3b8v5c1z0l2a4s6.lambda-url.ap-southeast-1.on.aws/ -> status=200 content-type=text/html
+https://qw7x2k9p4m6n3b8v5c1z0l2a4s6.lambda-url.ap-southeast-1.on.aws/style.css -> status=200 content-type=text/css
+https://qw7x2k9p4m6n3b8v5c1z0l2a4s6.lambda-url.ap-southeast-1.on.aws/cv.pdf -> status=200 content-type=application/pdf
+https://qw7x2k9p4m6n3b8v5c1z0l2a4s6.lambda-url.ap-southeast-1.on.aws/anything -> status=404 content-type=text/html
+https://cv-23l-3004.s3.ap-southeast-1.amazonaws.com/site/index.html -> status=403 content-type=application/xml
+
+== lambda-logs ==
+2026-11-13T17:46:01.123Z	2026/11/13/[$LATEST]a1b2c3d4e5f6a7b8	{"fn": "cv-func-23l-3004", "path": "/", "status": 200, "ms": 92}
+2026-11-13T17:46:05.456Z	2026/11/13/[$LATEST]a1b2c3d4e5f6a7b8	{"fn": "cv-func-23l-3004", "path": "/style.css", "status": 200, "ms": 41}
+2026-11-13T17:46:07.789Z	2026/11/13/[$LATEST]a1b2c3d4e5f6a7b8	{"fn": "cv-func-23l-3004", "path": "/cv.pdf", "status": 200, "ms": 118}
+2026-11-13T17:46:12.012Z	2026/11/13/[$LATEST]a1b2c3d4e5f6a7b8	{"fn": "cv-func-23l-3004", "path": "/anything", "status": 404, "ms": 6}
+2026-11-13T17:46:15.345Z	2026/11/13/[$LATEST]a1b2c3d4e5f6a7b8	{"fn": "cv-func-23l-3004", "path": "/", "status": 200, "ms": 87}
+
+== log-retention ==
+[
+    {
+        "logGroup": "/aws/lambda/cv-func-23l-3004",
+        "retentionInDays": 7
+    }
+]
